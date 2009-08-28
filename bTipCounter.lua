@@ -24,7 +24,6 @@ local function OnTooltipSetItem(tooltip, ...)
 			if not disableItemCount then
 				local itemCount = GetItemCount(link, false)
 				local itemBankcount = GetItemCount(link, true) - itemCount
-				local stacks = (itemCount/maxstack)
 				if itemCount + itemBankcount > 0 then
 					tooltip:AddDoubleLine("You have:", itemCount..(itemBankcount > 0 and (" (|cff88ffff+"..itemBankcount.."|r)") or ""), 0,1,1,1,1,1)
 				end
@@ -45,7 +44,7 @@ local function OnTooltipSetItem(tooltip, ...)
 end
 
 local function OnTooltipCleared(tooltip, ...)
-   lineAdded = false
+	lineAdded = false
 end
 
 GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
