@@ -1,0 +1,7 @@
+## Interface: 30200
+## Title: |cFF37FDFCb|rTipCounter
+## Notes: Adds item count, item id, item level and item stack size to the tooltip
+## Author: bruners
+## Version: v1.0
+
+bTipCounter.lua
