@@ -15,7 +15,7 @@ end
 local lineAdded = false
 local function OnTooltipSetItem(tooltip, ...)
 	local _, link = GameTooltip:GetItem()
-	local _,itemLink,_,ilevel,_,_,_,maxstack,_,_ = GetItemInfo(link)
+	local _,itemLink,_,ilevel,_,_,_,maxstack,_,_ = link and GetItemInfo(link)
 	if not lineAdded then
 		if ilevel ~= nil then
 			if not disableIlevel and GetCVar("ShowItemLevel") == "0" then
