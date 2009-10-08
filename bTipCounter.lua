@@ -2,9 +2,13 @@
 local disableStacksize = false
 local disableItemID = true
 local disableIlevel = false
+local leftR, leftG, leftB = 0,1,1
+local rightR, rightG, rightB = 1, 1, 1
+local AddDoubleLine = AddDoubleLine
 local GetItemInfo = GetItemInfo
 local GetItem = GetItem
 local GetItemCount = GetItemCount
+local origs = {}
 
 local function ToID(link)
 	if link then
@@ -12,43 +16,37 @@ local function ToID(link)
 	end
 end
 
-local lineAdded = false
-local function OnTooltipSetItem(tooltip, ...)
-	local _, link = GameTooltip:GetItem()
+local function OnTooltipSetItem(frame, ...)
+	local _, link = frame:GetItem()
 	if link then
 		local _,itemLink,_,ilevel,_,_,_,maxstack,_,_ = GetItemInfo(link)
-		if not lineAdded then
-			if ilevel ~= nil then
-				if not disableIlevel and GetCVar("ShowItemLevel") == "0" then
-					tooltip:AddDoubleLine("Item level:", ilevel, 0,1,1,1,1,1)
+		if ilevel then
+			if not disableIlevel and GetCVar("ShowItemLevel") == "0" then
+				frame:AddDoubleLine("Item level:", ilevel, leftR,leftG,leftB,rightR,rightG,rightB)
+			end
+			if not disableItemCount then
+				local itemCount = GetItemCount(link, false)
+				local itemBankcount = GetItemCount(link, true) - itemCount
+				if itemCount + itemBankcount > 0 then
+					frame:AddDoubleLine("You have:", itemCount..(itemBankcount > 0 and (" (|cff88ffff+"..itemBankcount.."|r)") or ""), leftR,leftG,leftB,rightR,rightG,rightB)
 				end
-				if not disableItemCount then
-					local itemCount = GetItemCount(link, false)
-					local itemBankcount = GetItemCount(link, true) - itemCount
-					if itemCount + itemBankcount > 0 then
-						tooltip:AddDoubleLine("You have:", itemCount..(itemBankcount > 0 
-and (" (|cff88ffff+"..itemBankcount.."|r)") or ""), 0,1,1,1,1,1)
-					end
+			end
+			if not disableStacksize then
+				if maxstack and maxstack > 1 then
+					frame:AddDoubleLine("Stack size:", maxstack,leftR,leftG,leftB,rightR,rightG,rightB)
 				end
-				if not disableStacksize then
-					if maxstack and maxstack > 1 then
-						tooltip:AddDoubleLine("Stack size:", maxstack,0,1,1,1,1,1)
-					end
-				end
-				if not disableItemID then
-					if itemLink then
-						tooltip:AddDoubleLine("Item ID:", ToID(itemLink), 0,1,1,1,1,1)
-					end
+			end
+			if not disableItemID then
+				if itemLink then
+					frame:AddDoubleLine("Item ID:", ToID(itemLink), leftR,leftG,leftB,rightR,rightG,rightB)
 				end
 			end
 		end
 	end
-	lineAdded = true
+	if origs[frame] then return origs[frame](frame, ...) end
 end
 
-local function OnTooltipCleared(tooltip, ...)
-	lineAdded = false
+for _,frame in pairs{GameTooltip, ItemRefTooltip, ShoppingTooltip1, ShoppingTooltip2} do
+	origs[frame] = frame:GetScript("OnTooltipSetItem")
+	frame:SetScript("OnTooltipSetItem", OnTooltipSetItem)
 end
-
-GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
-GameTooltip:HookScript("OnTooltipCleared", OnTooltipCleared)
